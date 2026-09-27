@@ -1,0 +1,20 @@
+[INFO] Scanning for projects...
+[ERROR] [ERROR] Some problems were encountered while processing the POMs:
+[ERROR] Invalid packaging for parent POM com.example:MysqlPro:0.0.1-SNAPSHOT, must be "pom" but is "jar" @ com.example:MysqlPro:0.0.1-SNAPSHOT
+[ERROR] Invalid packaging for parent POM com.example:MysqlPro:0.0.1-SNAPSHOT, must be "pom" but is "jar" @ com.example:MysqlPro:0.0.1-SNAPSHOT
+[ERROR] Invalid packaging for parent POM com.example:MysqlPro:0.0.1-SNAPSHOT, must be "pom" but is "jar" @ com.example:MysqlPro:0.0.1-SNAPSHOT
+[FATAL] The parents form a cycle: com.clinicqueue:clinic-queue:0.0.1-SNAPSHOT -> org.springframework.boot:spring-boot-starter-parent:4.1.1 -> org.springframework.boot:spring-boot-starter-parent:4.1.1 @ com.example:MysqlPro:0.0.1-SNAPSHOT
+ @ 
+[ERROR] The build could not read 1 project -> [Help 1]
+[ERROR]   
+[ERROR]   The project com.clinicqueue:clinic-queue:0.0.1-SNAPSHOT (E:\clinic-queue (1)\clinic-queue\pom.xml) has 4 errors
+[ERROR]     Invalid packaging for parent POM com.example:MysqlPro:0.0.1-SNAPSHOT, must be "pom" but is "jar" @ com.example:MysqlPro:0.0.1-SNAPSHOT
+[ERROR]     Invalid packaging for parent POM com.example:MysqlPro:0.0.1-SNAPSHOT, must be "pom" but is "jar" @ com.example:MysqlPro:0.0.1-SNAPSHOT
+[ERROR]     Invalid packaging for parent POM com.example:MysqlPro:0.0.1-SNAPSHOT, must be "pom" but is "jar" @ com.example:MysqlPro:0.0.1-SNAPSHOT
+[ERROR]     The parents form a cycle: com.clinicqueue:clinic-queue:0.0.1-SNAPSHOT -> org.springframework.boot:spring-boot-starter-parent:4.1.1 -> org.springframework.boot:spring-boot-starter-parent:4.1.1 @ com.example:MysqlPro:0.0.1-SNAPSHOT
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/ProjectBuildingException
