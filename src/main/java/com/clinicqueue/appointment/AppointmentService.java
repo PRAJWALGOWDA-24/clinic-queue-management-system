@@ -5,6 +5,7 @@ import com.clinicqueue.appointment.dto.BookSlotRequest;
 import com.clinicqueue.auditlog.AuditLogService;
 import com.clinicqueue.common.exception.BadRequestException;
 import com.clinicqueue.common.exception.ResourceNotFoundException;
+import com.clinicqueue.notification.NotificationService;
 import com.clinicqueue.patient.Patient;
 import com.clinicqueue.patient.PatientRepository;
 import com.clinicqueue.slot.Slot;
@@ -20,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class AppointmentService {
 
+    private final NotificationService notificationService;
     private final AppointmentRepository appointmentRepository;
     private final SlotRepository slotRepository;
     private final PatientRepository patientRepository;
@@ -58,7 +60,9 @@ public class AppointmentService {
         slotService.invalidateCache(slot.getDoctor().getId(), slot.getDate());
 
         auditLogService.log(patient.getUser().getId(), "BOOK_APPOINTMENT", "Appointment", appointment.getId());
-
+        notificationService.notifyUser(patient.getUser().getId(),
+                "Appointment booked with Dr. " + slot.getDoctor().getUser().getFullName()
+                        + " on " + slot.getDate() + " at " + slot.getStartTime() + ".");
         return toResponse(appointment);
     }
 
@@ -86,7 +90,8 @@ public class AppointmentService {
         slotService.invalidateCache(slot.getDoctor().getId(), slot.getDate());
 
         auditLogService.log(appointment.getPatient().getUser().getId(), "CANCEL_APPOINTMENT", "Appointment", appointment.getId());
-
+        notificationService.notifyUser(appointment.getPatient().getUser().getId(),
+                "Your appointment on " + slot.getDate() + " at " + slot.getStartTime() + " was cancelled.");
         return toResponse(appointment);
     }
 
@@ -101,6 +106,7 @@ public class AppointmentService {
                 .status(appointment.getStatus())
                 .build();
     }
+
 }
 
 /*

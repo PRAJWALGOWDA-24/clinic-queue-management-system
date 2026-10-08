@@ -4,6 +4,7 @@ import com.clinicqueue.appointment.Appointment;
 import com.clinicqueue.appointment.AppointmentRepository;
 import com.clinicqueue.common.exception.BadRequestException;
 import com.clinicqueue.common.exception.ResourceNotFoundException;
+import com.clinicqueue.notification.NotificationService;
 import com.clinicqueue.pharmacy.OrderStatus;
 import com.clinicqueue.pharmacy.Pharmacy;
 import com.clinicqueue.pharmacy.PharmacyOrder;
@@ -22,6 +23,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PrescriptionService {
 
+    private final NotificationService notificationService;
     private final PrescriptionRepository prescriptionRepository;
     private final AppointmentRepository appointmentRepository;
     private final PharmacyRepository pharmacyRepository;
@@ -63,7 +65,8 @@ public class PrescriptionService {
                 .status(OrderStatus.RECEIVED)
                 .build();
         pharmacyOrderRepository.save(order);
-
+        notificationService.notifyUser(appointment.getPatient().getUser().getId(),
+                "Your prescription was sent to " + pharmacy.getName() + ".");
         return toResponse(prescription, order);
     }
 

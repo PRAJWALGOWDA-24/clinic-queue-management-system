@@ -2,6 +2,7 @@ package com.clinicqueue.pharmacy;
 
 import com.clinicqueue.common.dto.ApiResponse;
 import com.clinicqueue.common.exception.ResourceNotFoundException;
+import com.clinicqueue.notification.NotificationService;
 import com.clinicqueue.pharmacy.dto.PharmacyOrderResponse;
 import com.clinicqueue.pharmacy.dto.UpdateOrderStatusRequest;
 import jakarta.validation.Valid;
@@ -15,7 +16,7 @@ import java.util.List;
 @RequestMapping("/api/pharmacy-orders")
 @RequiredArgsConstructor
 public class PharmacyOrderController {
-
+    private final NotificationService notificationService;
     private final PharmacyOrderRepository pharmacyOrderRepository;
 
     @GetMapping("/pharmacy/{pharmacyId}")
@@ -35,6 +36,8 @@ public class PharmacyOrderController {
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
         order.setStatus(request.getStatus());
         pharmacyOrderRepository.save(order);
+        notificationService.notifyUser(order.getPrescription().getAppointment().getPatient().getUser().getId(),
+                "Your pharmacy order status is now " + order.getStatus().name() + ".");
         return ApiResponse.success("Status updated", toResponse(order));
     }
 

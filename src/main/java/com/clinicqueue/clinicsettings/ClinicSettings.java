@@ -19,11 +19,5 @@ public class ClinicSettings extends BaseEntity {
     private Doctor doctor;
 
     @Builder.Default
-    private Integer graceMinutes = 5;
-
-    @Builder.Default
     private Integer maxSkips = 2;
-
-    @Builder.Default
-    private Integer reminderAtPosition = 2;
 }

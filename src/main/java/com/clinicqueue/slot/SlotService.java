@@ -7,6 +7,7 @@ import com.clinicqueue.doctor.DoctorRepository;
 import com.clinicqueue.slot.dto.CreateSlotRequest;
 import com.clinicqueue.slot.dto.SlotResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +31,12 @@ public class SlotService {
             throw new BadRequestException("End time must be after start time");
         }
 
+        long overlapping = slotRepository.countOverlappingSlots(
+                request.getDoctorId(), request.getDate(), request.getStartTime(), request.getEndTime());
+        if (overlapping > 0) {
+            throw new BadRequestException("This doctor already has a slot that overlaps this time");
+        }
+
         Slot slot = Slot.builder()
                 .doctor(doctor)
                 .date(request.getDate())
@@ -38,34 +45,32 @@ public class SlotService {
                 .isBooked(false)
                 .build();
 
-        slotRepository.save(slot);
+        try {
+            slotRepository.save(slot);
+        } catch (DataIntegrityViolationException e) {
+            // two requests passed the check at the same instant; the DB constraint stopped the second
+            throw new BadRequestException("This doctor already has a slot at this time");
+        }
 
-        // a new slot changes the list for this doctor/date — clear the stale cache
         invalidateCache(request.getDoctorId(), request.getDate());
-
         return toResponse(slot);
     }
 
     @SuppressWarnings("unchecked")
     public List<SlotResponse> getSlotsByDoctorAndDate(Long doctorId, LocalDate date) {
-
         String cacheKey = buildCacheKey(doctorId, date);
 
-        // 1. try the cache first
         Object cached = redisTemplate.opsForValue().get(cacheKey);
         if (cached != null) {
             return (List<SlotResponse>) cached;
         }
 
-        // 2. cache miss — go to MySQL
         List<SlotResponse> slots = slotRepository.findByDoctorIdAndDate(doctorId, date)
                 .stream()
                 .map(this::toResponse)
                 .toList();
 
-        // 3. save to cache for next time, expire in 2 minutes
         redisTemplate.opsForValue().set(cacheKey, slots, 2, TimeUnit.MINUTES);
-
         return slots;
     }
 

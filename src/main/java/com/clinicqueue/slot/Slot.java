@@ -8,7 +8,10 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 @Entity
-@Table(name = "slots")
+@Table(name = "slots", uniqueConstraints = {
+        @UniqueConstraint(name = "uk_slot_doctor_date_start",
+                columnNames = {"doctor_id", "date", "start_time"})
+})
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class Slot extends BaseEntity {
 
@@ -16,7 +19,7 @@ public class Slot extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne  //many slots can be associated with one doctor.
+    @ManyToOne
     @JoinColumn(name = "doctor_id", nullable = false)
     private Doctor doctor;
 
@@ -34,5 +37,5 @@ public class Slot extends BaseEntity {
     private boolean isBooked = false;
 
     @Version
-    private Integer version; // optimistic locking — prevents double-booking
+    private Integer version;
 }
